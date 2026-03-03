@@ -77,7 +77,13 @@ BOOLEAN l2c_link_hci_conn_req (BD_ADDR bd_addr)
 
         no_links = TRUE;
 
-        /* If we already have connection, accept as a master */
+        /* If we already have a connection, try to accept as master so that the
+         * ESP32 can act as piconet master across multiple links.  However, only
+         * request a role switch if the remote device is known to support it;
+         * on BT 1.1 devices the role switch succeeds at the LMP level but the
+         * subsequent LMP_host_connection_req (mandatory for the new master in
+         * BT 1.2+) is rejected with HCI 0x1a (Unsupported Remote Feature),
+         * failing the connection. */
         list_node_t *p_node = NULL;
         for (p_node = list_begin(l2cb.p_lcb_pool); p_node; p_node = list_next(p_node)) {
             p_lcb_cur = list_node(p_node);
@@ -87,7 +93,11 @@ BOOLEAN l2c_link_hci_conn_req (BD_ADDR bd_addr)
 
             if (p_lcb_cur->in_use) {
                 no_links = FALSE;
-                p_lcb->link_role = HCI_ROLE_MASTER;
+                if (btm_dev_support_switch (bd_addr)) {
+                    p_lcb->link_role = HCI_ROLE_MASTER;
+                } else {
+                    p_lcb->link_role = HCI_ROLE_SLAVE;
+                }
                 break;
             }
         }

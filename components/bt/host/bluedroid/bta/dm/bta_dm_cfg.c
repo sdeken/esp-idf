@@ -33,12 +33,26 @@
 
 #ifndef BTA_DM_LINK_POLICY_SETTINGS
 /* Do not include HCI_ENABLE_MASTER_SLAVE_SWITCH in the default link policy.
- * When this bit is set the controller firmware is permitted to autonomously
- * initiate a role switch (LMP_switch_req) during connection setup.  Legacy
- * BT 1.1 devices reject such requests with HCI error 0x1a (Unsupported
- * Remote Feature), which causes Connection_Complete to fail.  Profiles that
- * genuinely require master role (e.g. A2DP) manage role switching explicitly
- * on a per-connection basis via bta_sys_set_policy(). */
+ *
+ * The default link policy (HCI_Write_Default_Link_Policy_Settings) is applied
+ * by the controller to every new ACL link at the moment it is created, before
+ * the host ever sees a Connection_Complete event.  During the LMP connection
+ * setup phase, some legacy BT 1.1 devices (e.g. Sony Ericsson T610) send
+ * LMP_switch_req to give up the master role.  With the switch bit set in the
+ * default policy the controller accepts that request; ESP32 becomes the master
+ * and is then required (BT 1.2+) to send LMP_host_connection_req.  BT 1.1
+ * devices do not implement this PDU and respond with LMP_not_accepted(0x1a),
+ * causing Connection_Complete to fail with HCI error 0x1a.
+ *
+ * Removing the bit prevents the controller from accepting any LMP_switch_req
+ * from the peer, and also blocks host-requested role switches that are gated
+ * through the link policy (Accept_Connection_Request with role=0x00).  Both
+ * failure paths are therefore closed.
+ *
+ * Profiles that genuinely require master role (e.g. A2DP, HFP) request it
+ * explicitly on a per-connection basis via bta_sys_set_policy() /
+ * BTM_SetLinkPolicy() after the connection is established, which is
+ * unaffected by this default. */
 #define BTA_DM_LINK_POLICY_SETTINGS    (HCI_ENABLE_HOLD_MODE | HCI_ENABLE_SNIFF_MODE | HCI_ENABLE_PARK_MODE)
 #endif
 
