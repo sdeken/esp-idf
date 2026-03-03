@@ -2,10 +2,11 @@ menu "SPP Example Configuration"
     config EXAMPLE_SSP_ENABLED
         bool "Secure Simple Pairing"
         depends on BT_CLASSIC_ENABLED
-        default y
+        default n
         help
             This enables the Secure Simple Pairing. If disable this option,
-            Bluedroid will only support Legacy Pairing
+            Bluedroid will only support Legacy Pairing. Note: disabling SSP
+            is only recommended for testing/demonstration purposes.
 
     config EXAMPLE_LOCAL_DEVICE_NAME
         string "Local Device Name"
