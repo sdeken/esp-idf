@@ -514,9 +514,10 @@ BOOLEAN btm_dev_support_switch (BD_ADDR bd_addr)
         }
 
         /* If we don't know peer's capabilities, do not attempt role-switch.
-         * Older devices (e.g. BT 1.1) that do not exchange LMP features will
-         * reject a role-switch with HCI error 0x1a (Unsupported Remote Feature),
-         * causing the connection to fail. Accepting as slave is safe for all devices. */
+         * Treat an unknown remote device the same as one that has explicitly
+         * indicated no role-switch support, so that l2c_link_hci_conn_req
+         * accepts the incoming connection as slave when l2cb.desire_role
+         * is set to HCI_ROLE_MASTER by a higher layer. */
         if (feature_empty) {
             BTM_TRACE_DEBUG("btm_dev_support_switch return FALSE (feature empty)\n");
             return (FALSE);

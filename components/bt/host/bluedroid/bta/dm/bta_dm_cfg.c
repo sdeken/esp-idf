@@ -32,7 +32,14 @@
 #include "bta/bta_gap_bt_co.h"
 
 #ifndef BTA_DM_LINK_POLICY_SETTINGS
-#define BTA_DM_LINK_POLICY_SETTINGS    (HCI_ENABLE_MASTER_SLAVE_SWITCH | HCI_ENABLE_HOLD_MODE | HCI_ENABLE_SNIFF_MODE | HCI_ENABLE_PARK_MODE)
+/* Do not include HCI_ENABLE_MASTER_SLAVE_SWITCH in the default link policy.
+ * When this bit is set the controller firmware is permitted to autonomously
+ * initiate a role switch (LMP_switch_req) during connection setup.  Legacy
+ * BT 1.1 devices reject such requests with HCI error 0x1a (Unsupported
+ * Remote Feature), which causes Connection_Complete to fail.  Profiles that
+ * genuinely require master role (e.g. A2DP) manage role switching explicitly
+ * on a per-connection basis via bta_sys_set_policy(). */
+#define BTA_DM_LINK_POLICY_SETTINGS    (HCI_ENABLE_HOLD_MODE | HCI_ENABLE_SNIFF_MODE | HCI_ENABLE_PARK_MODE)
 #endif
 
 /* page timeout in 625uS */
