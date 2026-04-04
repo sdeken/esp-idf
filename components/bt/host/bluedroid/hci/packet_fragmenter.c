@@ -37,7 +37,7 @@
 #define START_PACKET_BOUNDARY 2
 #define CONTINUATION_PACKET_BOUNDARY 1
 #define L2CAP_HEADER_SIZE       4
-#define L2CAP_LENGTH_SIZE       2
+#define L2CAP_LENGTH_SIZE       1
 
 // TODO(zachoverflow): find good value for this
 #define NUMBER_OF_BUCKETS 42

@@ -26,8 +26,8 @@ config BTDM_CTRL_BLE_MAX_CONN
 config BTDM_CTRL_BR_EDR_MIN_ENC_KEY_SZ_DFT
     int "BR/EDR default minimum size of encryption key"
     depends on BTDM_CTRL_MODE_BR_EDR_ONLY || BTDM_CTRL_MODE_BTDM
-    default 7
-    range 7 16
+    default 5
+    range 5 16
     help
         BR/EDR default minimum size of encryption key when start encryption.
 
