@@ -31,12 +31,12 @@
 
 static const char local_device_name[] = CONFIG_EXAMPLE_LOCAL_DEVICE_NAME;
 static const esp_spp_mode_t esp_spp_mode = ESP_SPP_MODE_CB;
-static const bool esp_spp_enable_l2cap_ertm = true;
+static const bool esp_spp_enable_l2cap_ertm = false;
 
 static struct timeval time_new, time_old;
 static long data_num = 0;
 
-static const esp_spp_sec_t sec_mask = ESP_SPP_SEC_AUTHENTICATE;
+static const esp_spp_sec_t sec_mask = ESP_SPP_SEC_NONE; /* No authentication - for demo/testing only */
 static const esp_spp_role_t role_slave = ESP_SPP_ROLE_SLAVE;
 
 static char *bda2str(uint8_t * bda, char *str, size_t size)
@@ -163,12 +163,12 @@ void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *param)
             esp_bt_pin_code_t pin_code = {0};
             esp_bt_gap_pin_reply(param->pin_req.bda, true, 16, pin_code);
         } else {
-            ESP_LOGI(SPP_TAG, "Input pin code: 1234");
+            ESP_LOGI(SPP_TAG, "Input pin code: 0000");
             esp_bt_pin_code_t pin_code;
-            pin_code[0] = '1';
-            pin_code[1] = '2';
-            pin_code[2] = '3';
-            pin_code[3] = '4';
+            pin_code[0] = '0';
+            pin_code[1] = '0';
+            pin_code[2] = '0';
+            pin_code[3] = '0';
             esp_bt_gap_pin_reply(param->pin_req.bda, true, 4, pin_code);
         }
         break;
@@ -266,11 +266,15 @@ void app_main(void)
 
     /*
      * Set default parameters for Legacy Pairing
-     * Use variable pin, input pin code when pairing
+     * Use fixed pin code: 0000
      */
-    esp_bt_pin_type_t pin_type = ESP_BT_PIN_TYPE_VARIABLE;
+    esp_bt_pin_type_t pin_type = ESP_BT_PIN_TYPE_FIXED;
     esp_bt_pin_code_t pin_code;
-    esp_bt_gap_set_pin(pin_type, 0, pin_code);
+    pin_code[0] = '0';
+    pin_code[1] = '0';
+    pin_code[2] = '0';
+    pin_code[3] = '0';
+    esp_bt_gap_set_pin(pin_type, 4, pin_code);
 
     ESP_LOGI(SPP_TAG, "Own address:[%s]", bda2str((uint8_t *)esp_bt_dev_get_address(), bda_str, sizeof(bda_str)));
 }

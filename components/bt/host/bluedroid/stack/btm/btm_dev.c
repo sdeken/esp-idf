@@ -513,10 +513,13 @@ BOOLEAN btm_dev_support_switch (BD_ADDR bd_addr)
             }
         }
 
-        /* If we don't know peer's capabilities, assume it supports Role-switch */
+        /* Device record exists but LMP features have not yet been received
+         * (all-zero feature bytes).  Treat this the same as explicit no-switch
+         * support so that l2c_link_hci_conn_req accepts as slave rather than
+         * attempting a role switch whose outcome is unknown. */
         if (feature_empty) {
-            BTM_TRACE_DEBUG("btm_dev_support_switch return TRUE (feature empty)\n");
-            return (TRUE);
+            BTM_TRACE_DEBUG("btm_dev_support_switch return FALSE (feature empty)\n");
+            return (FALSE);
         }
     }
 
